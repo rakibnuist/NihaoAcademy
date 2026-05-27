@@ -132,7 +132,7 @@ export default async function StudentsPage({
                   >
                     <td className="px-4 py-3 font-medium">{s.full_name}</td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                      {s.phone}
+                      {s.phone ?? "—"}
                     </td>
                     <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
                       {s.email ?? "—"}
