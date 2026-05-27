@@ -2,12 +2,14 @@ import Link from "next/link";
 import {
   ArrowRight,
   Award,
-  CheckCircle2,
-  GraduationCap,
+  BadgeCheck,
+  FileText,
+  PlaneLanding,
+  PlaneTakeoff,
   PlayCircle,
   Quote,
+  Radio,
   ShieldCheck,
-  Sparkles,
   Star,
   Users,
 } from "lucide-react";
@@ -17,65 +19,22 @@ import { courses } from "@/lib/courses";
 import { faqs, stats, testimonials } from "@/lib/site";
 import type { BrandAccent } from "@/types";
 import { buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Container } from "@/components/public/container";
 import { CourseCard } from "@/components/public/course-card";
+import { BoardingPass } from "@/components/public/boarding-pass";
+import { Marquee } from "@/components/public/marquee";
 
-const features = [
-  {
-    icon: Users,
-    title: "Expert, caring instructors",
-    description:
-      "Learn from native and HSK-certified teachers in small live batches, with real feedback every class.",
-  },
-  {
-    icon: Award,
-    title: "Mock tests & smart feedback",
-    description:
-      "Weekly timed mock tests and per-topic score reports show you exactly what to revise next.",
-  },
-  {
-    icon: PlayCircle,
-    title: "Online + in-person, recorded",
-    description:
-      "Join live online or at our Dhaka campus — every lesson is recorded in your student library.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Full study-abroad support",
-    description:
-      "From scholarships to your visa checklist, we guide you all the way to your university seat.",
-  },
-];
-
-const steps = [
-  {
-    icon: GraduationCap,
-    title: "Choose your course",
-    description:
-      "Pick the track that fits your goal — Chinese, HSK, DET, or our Foundation study-abroad program.",
-  },
-  {
-    icon: CheckCircle2,
-    title: "Enroll & join your batch",
-    description:
-      "Enroll in minutes and pay securely with bKash, Nagad, or card. We add you to the right batch.",
-  },
-  {
-    icon: Sparkles,
-    title: "Learn, test & achieve",
-    description:
-      "Attend live classes, take mock tests, track your progress, and reach your target — step by step.",
-  },
-];
+const ctaPrimary = cn(
+  buttonVariants({ size: "lg" }),
+  "h-11 bg-brand-red px-6 text-sm text-brand-red-foreground hover:bg-brand-red/90"
+);
 
 const fallbackAccent: Record<BrandAccent, string> = {
   blue: "bg-primary/10 text-primary",
@@ -83,217 +42,235 @@ const fallbackAccent: Record<BrandAccent, string> = {
   gold: "bg-brand-gold/20 text-[oklch(0.5_0.12_72)]",
 };
 
+/* 4 featured courses for the homepage spotlight */
+const featuredCourses = courses.filter((c) => c.featured);
+
+const itinerary = [
+  {
+    code: "01",
+    icon: FileText,
+    label: "Departure",
+    title: "Choose your route",
+    description:
+      "Pick the course that matches your destination — CSCA admission, HSK, Professional Chinese or DET.",
+  },
+  {
+    code: "02",
+    icon: Radio,
+    label: "In flight",
+    title: "Learn & get tested",
+    description:
+      "Join live Zoom sessions or watch recorded lessons at your own pace — mock exams keep you on course.",
+  },
+  {
+    code: "03",
+    icon: Award,
+    label: "Passing gate",
+    title: "Pass your exam",
+    description:
+      "Hit your HSK level, CSCA score or DET target. We track your progress every step of the way.",
+  },
+  {
+    code: "04",
+    icon: PlaneLanding,
+    label: "Arrival",
+    title: "Land abroad",
+    description:
+      "University offer, CSC scholarship, visa cleared — your flight from Dhaka to campus, complete.",
+  },
+];
+
+const features = [
+  {
+    icon: Users,
+    title: "Expert, caring instructors",
+    description:
+      "Native and certified teachers in small live batches — real feedback every session.",
+  },
+  {
+    icon: Award,
+    title: "Mock tests & smart feedback",
+    description:
+      "Weekly timed mocks with per-topic score reports so you know exactly what to revise.",
+  },
+  {
+    icon: PlayCircle,
+    title: "Live and recorded, your choice",
+    description:
+      "Join live Zoom classes on a fixed schedule or learn from the recorded library at your own pace.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "All the way to departure",
+    description:
+      "From your first lesson to your university offer — we don't stop until you're boarding.",
+  },
+];
+
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-linear-to-b from-secondary/60 to-background">
-        <div
-          aria-hidden
-          className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-24 left-1/2 size-[42rem] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
-        />
-        <Container className="relative py-20 text-center sm:py-28">
-          <Badge
-            variant="outline"
-            className="h-7 gap-2 border-border bg-background/70 px-3 backdrop-blur"
-          >
-            <span className="size-1.5 rounded-full bg-brand-gold" />
-            你好 · Now enrolling for 2026
-          </Badge>
+      {/* ─── Hero ─── */}
+      <section className="relative overflow-hidden">
+        <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" />
+        <div aria-hidden className="pointer-events-none absolute -top-32 -right-24 size-[40rem] rounded-full bg-brand-gold/10 blur-3xl" />
+        <Container className="relative grid items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:py-24">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 font-mono text-[11px] font-medium tracking-[0.18em] text-foreground/70 uppercase shadow-sm">
+              <PlaneTakeoff className="size-3.5 text-brand-red" />
+              Dhaka (DAC) <span className="text-brand-gold">→</span> 中国 · Boarding now
+            </span>
 
-          <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-            Your path from{" "}
-            <span className="bg-linear-to-r from-primary to-[oklch(0.55_0.18_300)] bg-clip-text text-transparent">
-              你好
-            </span>{" "}
-            to a world-class degree
-          </h1>
+            <h1 className="mt-6 font-heading text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+              From <span className="text-brand-red">你好</span> to a degree{" "}
+              <span className="relative whitespace-nowrap">
+                abroad
+                <span
+                  aria-hidden
+                  className="absolute -bottom-1 left-0 h-1 w-full border-b-2 border-dashed border-brand-gold"
+                />
+              </span>
+              .
+            </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Bangladesh&apos;s dedicated academy for Chinese language, HSK &amp;
-            DET preparation, and study-abroad admissions — taught by experts,
-            online and in Dhaka.
-          </p>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              NiHao Academy is Bangladesh&apos;s dedicated prep academy for CSCA
+              university admissions, HSK &amp; DET certification, and Professional
+              Chinese — with live Zoom classes and a self-paced recorded library.
+            </p>
 
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/enroll"
-              className={cn(buttonVariants({ size: "lg" }), "h-11 px-6 text-sm")}
-            >
-              Enroll now
-              <ArrowRight />
-            </Link>
-            <Link
-              href="/courses"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "h-11 px-6 text-sm"
-              )}
-            >
-              Explore courses
-            </Link>
-          </div>
-
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <div className="flex -space-x-2.5">
-              {testimonials.map((t) => (
-                <Avatar key={t.name} className="size-9 ring-2 ring-background">
-                  <AvatarFallback
-                    className={cn("font-medium", fallbackAccent[t.accent])}
-                  >
-                    {t.initials}
-                  </AvatarFallback>
-                </Avatar>
-              ))}
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link href="/enroll" className={ctaPrimary}>
+                Reserve your seat
+                <ArrowRight />
+              </Link>
+              <Link
+                href="/courses"
+                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 px-6 text-sm")}
+              >
+                View all routes
+              </Link>
             </div>
-            <div className="text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1 text-foreground">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="size-4 fill-brand-gold text-brand-gold"
-                  />
+
+            <div className="mt-9 flex flex-wrap items-center gap-x-4 gap-y-3">
+              <div className="flex -space-x-2.5">
+                {testimonials.map((t) => (
+                  <Avatar key={t.name} className="size-9 ring-2 ring-background">
+                    <AvatarFallback className={cn("font-medium", fallbackAccent[t.accent])}>
+                      {t.initials}
+                    </AvatarFallback>
+                  </Avatar>
                 ))}
-              </span>
-              <span className="ml-1">
-                Loved by <span className="font-semibold text-foreground">2,400+</span>{" "}
-                students
-              </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-0.5 align-middle">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="size-4 fill-brand-gold text-brand-gold" />
+                  ))}
+                </span>{" "}
+                <span className="font-semibold text-foreground">2,400+</span>{" "}
+                students boarded
+              </div>
             </div>
+          </div>
+
+          <div className="relative">
+            <div aria-hidden className="pointer-events-none absolute -inset-x-6 -top-10 -bottom-6 -z-10">
+              <svg viewBox="0 0 400 300" className="size-full" fill="none">
+                <path
+                  d="M20 250 Q 200 40 380 120"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeDasharray="6 8"
+                  className="text-brand-gold/40"
+                />
+              </svg>
+            </div>
+            <BoardingPass className="mx-auto max-w-md lg:mr-0" />
           </div>
         </Container>
       </section>
 
-      {/* Stats */}
-      <section className="border-y border-border bg-background">
-        <Container className="grid grid-cols-2 gap-px overflow-hidden lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="px-2 py-8 text-center">
-              <div className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                {stat.value}
-              </div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                {stat.label}
-              </div>
-            </div>
-          ))}
+      {/* ─── Departures ticker ─── */}
+      <section className="bg-primary py-3 text-primary-foreground">
+        <Container className="flex items-center gap-5">
+          <span className="hidden shrink-0 font-mono text-[11px] font-semibold tracking-[0.2em] text-brand-gold uppercase sm:inline">
+            Now boarding for
+          </span>
+          <Marquee className="flex-1" />
         </Container>
       </section>
 
-      {/* Courses */}
+      {/* ─── Featured routes ─── */}
       <section id="courses" className="py-20 sm:py-24">
         <Container>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold tracking-wider text-primary uppercase">
-              Our courses
-            </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              A track for every goal
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Whether you&apos;re starting Chinese from scratch or applying to
-              universities abroad, there&apos;s a clear path for you.
-            </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-xl">
+              <p className="font-mono text-xs font-semibold tracking-[0.2em] text-brand-red uppercase">
+                Featured departures
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+                Choose your route
+              </h2>
+              <p className="mt-3 text-lg text-muted-foreground">
+                Four of our most popular routes — or view the full departures
+                board for all seven.
+              </p>
+            </div>
+            <Link
+              href="/courses"
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "shrink-0")}
+            >
+              Full departures board
+              <ArrowRight />
+            </Link>
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {courses.map((course) => (
+            {featuredCourses.map((course) => (
               <CourseCard key={course.slug} course={course} />
             ))}
           </div>
         </Container>
       </section>
 
-      {/* Why NiHao */}
+      {/* ─── Journey itinerary ─── */}
       <section className="border-y border-border bg-secondary/40 py-20 sm:py-24">
         <Container>
-          <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
-            <div className="lg:sticky lg:top-24 lg:self-start">
-              <p className="text-sm font-semibold tracking-wider text-primary uppercase">
-                Why NiHao Academy
-              </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                Built to get you results, not just lessons
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Everything we do is designed around one thing: helping you reach
-                your target — a passed exam, a great score, or a seat at the
-                university of your dreams.
-              </p>
-              <Link
-                href="/about"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
-                  "mt-7"
-                )}
-              >
-                More about us
-                <ArrowRight />
-              </Link>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2">
-              {features.map((feature) => {
-                const Icon = feature.icon;
-                return (
-                  <Card key={feature.title} className="h-full">
-                    <CardContent className="flex flex-col gap-3">
-                      <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary">
-                        <Icon className="size-5" />
-                      </span>
-                      <h3 className="font-heading text-base font-semibold">
-                        {feature.title}
-                      </h3>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {feature.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* How it works */}
-      <section className="py-20 sm:py-24">
-        <Container>
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold tracking-wider text-primary uppercase">
-              How it works
+            <p className="font-mono text-xs font-semibold tracking-[0.2em] text-brand-red uppercase">
+              Your itinerary
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              Get started in three simple steps
+            <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+              Four stops to your destination
             </h2>
           </div>
 
-          <div className="relative mt-14 grid gap-8 sm:grid-cols-3">
+          <div className="relative mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             <div
               aria-hidden
-              className="absolute top-6 right-[16%] left-[16%] hidden h-px bg-linear-to-r from-transparent via-border to-transparent sm:block"
+              className="absolute top-7 right-[12%] left-[12%] hidden border-t-2 border-dashed border-border lg:block"
             />
-            {steps.map((step, i) => {
-              const Icon = step.icon;
+            {itinerary.map((stop) => {
+              const Icon = stop.icon;
               return (
-                <div key={step.title} className="relative text-center">
-                  <div className="mx-auto grid size-12 place-items-center rounded-2xl border border-border bg-background text-primary shadow-sm">
-                    <Icon className="size-5" />
+                <div key={stop.code} className="relative text-center">
+                  <div className="relative mx-auto grid size-14 place-items-center rounded-full border-2 border-dashed border-brand-gold/60 bg-background">
+                    <div className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground">
+                      <Icon className="size-5" />
+                    </div>
                   </div>
-                  <div className="mx-auto mt-4 flex items-center justify-center gap-2">
-                    <span className="text-xs font-semibold text-muted-foreground">
-                      Step {i + 1}
-                    </span>
+                  <div className="mt-4 font-mono text-[10px] font-semibold tracking-[0.2em] text-brand-gold uppercase">
+                    {stop.label}
                   </div>
-                  <h3 className="mt-1 font-heading text-lg font-semibold">
-                    {step.title}
+                  <div className="font-mono text-xs tracking-[0.12em] text-brand-red">
+                    STOP {stop.code}
+                  </div>
+                  <h3 className="mt-1.5 font-heading text-lg font-semibold">
+                    {stop.title}
                   </h3>
                   <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                    {step.description}
+                    {stop.description}
                   </p>
                 </div>
               );
@@ -302,58 +279,109 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Testimonials */}
-      <section className="border-t border-border bg-secondary/40 py-20 sm:py-24">
+      {/* ─── Why fly with us ─── */}
+      <section className="py-20 sm:py-24">
+        <Container className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <p className="font-mono text-xs font-semibold tracking-[0.2em] text-brand-red uppercase">
+              Why fly with us
+            </p>
+            <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+              Built to get you there, not just teach you
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Every detail is designed around your destination — a passed exam,
+              a great score, and a seat at the university of your dreams.
+            </p>
+            <Link
+              href="/about"
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "mt-7")}
+            >
+              More about us
+              <ArrowRight />
+            </Link>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <div key={feature.title} className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
+                  <span className="grid size-11 place-items-center rounded-md bg-primary/10 text-primary">
+                    <Icon className="size-5" />
+                  </span>
+                  <h3 className="mt-4 font-heading text-base font-semibold">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {feature.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </Container>
+      </section>
+
+      {/* ─── Testimonials / Arrivals ─── */}
+      <section className="border-y border-border bg-secondary/40 py-20 sm:py-24">
         <Container>
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold tracking-wider text-primary uppercase">
-              Student stories
+            <p className="font-mono text-xs font-semibold tracking-[0.2em] text-brand-red uppercase">
+              Arrivals · Student stories
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              Real students, real results
+            <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+              They landed
             </h2>
           </div>
 
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
             {testimonials.map((t) => (
-              <Card key={t.name} className="h-full">
-                <CardContent className="flex h-full flex-col gap-5">
-                  <Quote className="size-7 text-primary/30" />
-                  <p className="flex-1 text-[15px] leading-relaxed text-foreground">
-                    “{t.quote}”
-                  </p>
-                  <div className="flex items-center gap-3 border-t border-border pt-4">
-                    <Avatar className="size-10">
-                      <AvatarFallback
-                        className={cn("font-medium", fallbackAccent[t.accent])}
-                      >
-                        {t.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-semibold">
-                        {t.name}
-                      </div>
-                      <div className="truncate text-xs text-muted-foreground">
-                        {t.role}
-                      </div>
-                    </div>
+              <figure
+                key={t.name}
+                className="flex h-full flex-col rounded-xl bg-card p-6 ring-1 ring-foreground/10"
+              >
+                <Quote className="size-7 text-brand-red/30" />
+                <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-foreground">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <figcaption className="mt-5 flex items-center gap-3 border-t border-dashed border-border pt-4">
+                  <Avatar className="size-10">
+                    <AvatarFallback className={cn("font-medium", fallbackAccent[t.accent])}>
+                      {t.initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold">{t.name}</div>
+                    <div className="truncate text-xs text-muted-foreground">{t.role}</div>
                   </div>
-                </CardContent>
-              </Card>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div className="mt-14 grid grid-cols-2 gap-6 rounded-2xl bg-primary p-8 text-primary-foreground sm:p-10 lg:grid-cols-4">
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+                  {stat.value}
+                </div>
+                <div className="mt-1 text-sm text-primary-foreground/70">{stat.label}</div>
+              </div>
             ))}
           </div>
         </Container>
       </section>
 
-      {/* FAQ */}
+      {/* ─── FAQ ─── */}
       <section className="py-20 sm:py-24">
         <Container className="max-w-3xl">
           <div className="text-center">
-            <p className="text-sm font-semibold tracking-wider text-primary uppercase">
-              FAQ
+            <p className="font-mono text-xs font-semibold tracking-[0.2em] text-brand-red uppercase">
+              Help desk · FAQ
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
               Questions, answered
             </h2>
           </div>
@@ -373,31 +401,33 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* CTA */}
+      {/* ─── Bottom CTA ─── */}
       <section className="pb-20 sm:pb-24">
         <Container>
-          <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary to-[oklch(0.36_0.18_285)] px-6 py-14 text-center sm:px-12 sm:py-20">
-            <div
-              aria-hidden
-              className="bg-grid pointer-events-none absolute inset-0 opacity-[0.15] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]"
-            />
+          <div className="relative overflow-hidden rounded-3xl bg-primary px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-20">
+            <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-20 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
+            <div aria-hidden className="pointer-events-none absolute -top-20 -right-20 size-72 rounded-full bg-brand-gold/10 blur-3xl" />
             <div className="relative">
-              <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                Ready to start your journey?
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 font-mono text-[11px] tracking-[0.2em] text-brand-gold uppercase">
+                <BadgeCheck className="size-3.5" />
+                Boarding now for 2026
+              </span>
+              <h2 className="mx-auto mt-5 max-w-2xl font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+                Ready for departure?
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-primary-foreground/80">
-                Join thousands of students learning Chinese and studying abroad
-                with NiHao Academy.
+                Reserve your seat today and start the journey from 你好 to a
+                world-class education abroad.
               </p>
               <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/enroll"
                   className={cn(
-                    buttonVariants({ variant: "secondary", size: "lg" }),
-                    "h-11 bg-background px-6 text-foreground hover:bg-background/90"
+                    buttonVariants({ size: "lg" }),
+                    "h-11 bg-brand-red px-6 text-brand-red-foreground hover:bg-brand-red/90"
                   )}
                 >
-                  Enroll now
+                  Get your boarding pass
                   <ArrowRight />
                 </Link>
                 <Link
@@ -407,7 +437,7 @@ export default function HomePage() {
                     "h-11 px-6 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground"
                   )}
                 >
-                  Talk to us
+                  Talk to an advisor
                 </Link>
               </div>
             </div>

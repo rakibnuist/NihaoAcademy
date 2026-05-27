@@ -20,7 +20,7 @@ export function Logo({
         className
       )}
     >
-      <span className="relative grid size-9 shrink-0 place-items-center rounded-xl bg-linear-to-br from-primary to-[oklch(0.42_0.2_286)] text-lg leading-none font-semibold text-primary-foreground shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
+      <span className="relative grid size-9 shrink-0 place-items-center rounded-md bg-linear-to-br from-primary to-[oklch(0.2_0.04_264)] font-heading text-lg leading-none font-semibold text-primary-foreground shadow-sm ring-1 ring-brand-gold/40 transition-transform duration-200 group-hover:-translate-y-0.5">
         你
         <span className="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full bg-brand-gold ring-2 ring-background" />
       </span>

@@ -4,7 +4,7 @@ export const siteConfig = {
   name: "NiHao Academy",
   nameZh: "你好学院",
   description:
-    "Chinese language, HSK, DET and study-abroad preparation for Bangladeshi students.",
+    "CSCA admission prep, HSK, Professional Chinese and DET preparation for Bangladeshi students.",
   url: "https://nihaoacademy.com",
   contact: {
     phone: "+880 1700-000000",
@@ -24,6 +24,25 @@ export const mainNav: NavItem[] = [
   { label: "Contact", href: "/contact" },
 ];
 
+export const destinations: string[] = [
+  "Tsinghua University",
+  "Peking University",
+  "Zhejiang University",
+  "Fudan University",
+  "Shanghai Jiao Tong",
+  "Wuhan University",
+  "HUST · Wuhan",
+  "CSC Scholarship",
+  "Beijing",
+  "Shanghai",
+  "Hangzhou",
+  "Nanjing",
+  "HSK Certified",
+  "DET 125+",
+  "Chengdu",
+  "Xi'an",
+];
+
 export const stats: Stat[] = [
   { value: "2,400+", label: "Students taught" },
   { value: "95%", label: "HSK pass rate" },
@@ -34,54 +53,59 @@ export const stats: Stat[] = [
 export const testimonials: Testimonial[] = [
   {
     name: "Tahmina Akter",
-    role: "HSK 5 · Now studying at Zhejiang University",
+    role: "HSK 3 · Now studying at Zhejiang University",
     initials: "TA",
     quote:
-      "I started from zero Chinese. The structured HSK track and weekly mock tests got me to HSK 5 in a year — and a full CSC scholarship.",
+      "I started from zero Chinese. The structured HSK track and weekly mock tests got me to HSK 3 in six months — and a full CSC scholarship followed.",
     accent: "blue",
   },
   {
     name: "Rifat Hossain",
-    role: "Duolingo English Test · 125",
+    role: "DET Crash Course · Score 125",
     initials: "RH",
     quote:
-      "The DET prep was incredibly focused. The practice questions felt exactly like the real test. Scored 125 on my first attempt.",
+      "The recorded lessons were incredibly focused. Every question type covered, every strategy explained. Scored 125 on my first attempt.",
     accent: "gold",
   },
   {
     name: "Nusrat Jahan",
-    role: "Foundation Program · Studying in Beijing",
+    role: "All Star CSCA · Accepted to MBBS at HUST",
     initials: "NJ",
     quote:
-      "From document prep to the visa checklist, NiHao Academy handled everything. I never felt lost in the study-abroad process.",
+      "The All Star track covered everything — Maths, Physics, Chemistry. The live classes and recorded library together meant I never had to guess what to study.",
     accent: "red",
   },
 ];
 
 export const faqs: FaqItem[] = [
   {
-    question: "Do I need any prior Chinese knowledge to start?",
+    question: "Do I need any prior knowledge to start a CSCA course?",
     answer:
-      "Not at all. Our CSCA and HSK 1 tracks are designed for complete beginners. We start from pinyin and tones and build up systematically.",
+      "No. Our CSCA tracks are built for students at secondary or A-Level stage. We assume you know high-school maths and sciences, and we build the exam technique and bilingual terminology from there.",
   },
   {
-    question: "Are classes online or in person?",
+    question: "What is the difference between the Live and Recorded divisions?",
     answer:
-      "Both. Every course runs as live online batches and selected in-person batches at our Dhaka campus. Recorded lessons are available in your student library either way.",
+      "Live classes run on a fixed weekly schedule via Zoom — you join in real time, ask questions and practice with classmates. Recorded courses are a self-paced video library you can watch any time; they're ideal if you have a busy schedule or just want to move at your own pace.",
+  },
+  {
+    question: "Can I access the recorded lessons if I'm enrolled in a Live course?",
+    answer:
+      "Yes — every Live division enrollment also unlocks the full recorded library for that course. You get the best of both: live instruction and the ability to re-watch every lesson whenever you need.",
   },
   {
     question: "How do payments work?",
     answer:
-      "You can pay securely with bKash, Nagad, or any card through our checkout. Installment options are available for the Foundation and long HSK tracks.",
+      "You can pay securely with bKash, Nagad or any card through our checkout. Installment options are available for the longer CSCA tracks.",
   },
   {
-    question: "Do you help with scholarships and visas?",
+    question: "Do you help with scholarship and university applications?",
     answer:
-      "Yes. Our Foundation Program includes university selection, application and document support, scholarship guidance, and a full visa checklist with one-on-one help.",
+      "Our CSCA courses include exam preparation only. For personalised university shortlisting, application support and scholarship guidance, reach out to our advisors directly via WhatsApp — we're happy to help.",
   },
   {
     question: "What happens after I enroll?",
     answer:
-      "You'll receive an SMS and email confirmation, get added to your batch, and unlock your student dashboard with the schedule, lessons, and announcements.",
+      "You'll receive a confirmation SMS and email, get added to your batch, and unlock your student dashboard with the schedule, recorded lessons and announcements — usually within 24 hours.",
   },
 ];
