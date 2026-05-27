@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack && mkdir -p .next/standalone/nihao-academy/.next && cp -r .next/static .next/standalone/nihao-academy/.next/static",
+    "build": "next build --webpack && cp -r public .next/standalone/nihao-academy/public",
     "start": "NODE_OPTIONS='--max-old-space-size=384' node .next/standalone/nihao-academy/server.js",
     "lint": "eslint"
   },
