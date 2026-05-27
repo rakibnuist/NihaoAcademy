@@ -50,33 +50,44 @@ export default async function proxy(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const path = request.nextUrl.pathname;
+    const path    = request.nextUrl.pathname;
+    const role    = user?.app_metadata?.role as string | undefined;
+    const isAdmin = role === "admin";
 
-    // ── Protected routes ────────────────────────────────────────────────────
     const isStudentRoute = path.startsWith("/student");
-    const isAdminRoute = path.startsWith("/admin");
+    const isAdminRoute   = path.startsWith("/admin");
+    const isAuthPage     = path === "/login" || path === "/verify";
+    const isProfileSetup = path.startsWith("/setup");
 
+    // ── Unauthenticated → login ──────────────────────────────────────────────
     if ((isStudentRoute || isAdminRoute) && !user) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("next", path);
       return NextResponse.redirect(loginUrl);
     }
 
-    // Admin-only check: role is stored in app_metadata (set server-side).
-    // If a non-admin student hits /admin, redirect to student dashboard.
-    if (isAdminRoute && user) {
-      const role = user.app_metadata?.role as string | undefined;
-      if (role !== "admin") {
-        return NextResponse.redirect(new URL("/student/dashboard", request.url));
+    // ── Admin → never allowed in student area ───────────────────────────────
+    if (isStudentRoute && user && isAdmin) {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+
+    // ── Non-admin → never allowed in admin area ─────────────────────────────
+    if (isAdminRoute && user && !isAdmin) {
+      return NextResponse.redirect(new URL("/student/dashboard", request.url));
+    }
+
+    // ── Student without completed profile → setup page ──────────────────────
+    // Use user_metadata flag to avoid a DB call on every request.
+    if (isStudentRoute && !isProfileSetup && user && !isAdmin) {
+      const profileDone = user.user_metadata?.profile_completed === true;
+      if (!profileDone) {
+        return NextResponse.redirect(new URL("/setup", request.url));
       }
     }
 
-    // ── Auth pages redirect when already logged in ──────────────────────────
-    const isAuthPage = path === "/login" || path === "/verify";
+    // ── Already logged-in → skip auth pages ────────────────────────────────
     if (isAuthPage && user) {
-      const role = user.app_metadata?.role as string | undefined;
-      const dest =
-        role === "admin" ? "/admin/dashboard" : "/student/dashboard";
+      const dest = isAdmin ? "/admin/dashboard" : "/student/dashboard";
       return NextResponse.redirect(new URL(dest, request.url));
     }
   } catch (error) {

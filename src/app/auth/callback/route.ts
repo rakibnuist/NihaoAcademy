@@ -37,20 +37,36 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
-      // Determine destination
-      let destination = next ?? "/student/dashboard";
+    if (!error && data.user) {
+      const user = data.user;
+      const role = user.app_metadata?.role as string | undefined;
 
-      // If no explicit `next`, check role and route appropriately
-      if (!next) {
-        const role = data.user?.app_metadata?.role as string | undefined;
-        if (role === "admin") destination = "/admin/dashboard";
+      // Admin always goes to admin dashboard, ignores ?next
+      if (role === "admin") {
+        return NextResponse.redirect(new URL("/admin/dashboard", origin));
       }
 
-      return NextResponse.redirect(new URL(destination, origin));
+      // Student: check if profile is complete
+      const { data: student } = await supabase
+        .from("students")
+        .select("profile_completed")
+        .eq("id", user.id)
+        .single();
+
+      const profileDone = (student as { profile_completed: boolean } | null)?.profile_completed ?? false;
+
+      if (!profileDone) {
+        // First login → complete profile first
+        const setupUrl = new URL("/setup", origin);
+        if (next) setupUrl.searchParams.set("next", next);
+        return NextResponse.redirect(setupUrl);
+      }
+
+      // Profile complete → go to intended page or dashboard
+      return NextResponse.redirect(new URL(next ?? "/student/dashboard", origin));
     }
 
-    console.error("[auth/callback] exchangeCodeForSession error:", error.message);
+    if (error) console.error("[auth/callback] exchangeCodeForSession error:", error.message);
   }
 
   // No code or exchange failed — back to login with error hint
