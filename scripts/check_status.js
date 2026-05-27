@@ -4,6 +4,17 @@ import { fileURLToPath } from 'url';
 
 async function main() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const runtimePath = path.join(__dirname, '../node_modules/hostinger-api-mcp/src/core/runtime.js');
+  let runtimeContent = fs.readFileSync(runtimePath, 'utf8');
+
+  // Replace classes with export
+  runtimeContent = runtimeContent.replace('class MCPServer {', 'export class MCPServer {');
+  runtimeContent = runtimeContent.replace('class OAuthProvider {', 'export class OAuthProvider {');
+
+  const exportedRuntimePath = path.join(__dirname, '../node_modules/hostinger-api-mcp/src/core/runtime_exported.js');
+  fs.writeFileSync(exportedRuntimePath, runtimeContent, 'utf8');
+
+  // Dynamically import MCPServer and tools
   const { MCPServer } = await import('../node_modules/hostinger-api-mcp/src/core/runtime_exported.js');
   const hostingToolsModule = await import('../node_modules/hostinger-api-mcp/src/core/tools/hosting.js');
   const hostingTools = hostingToolsModule.default;
