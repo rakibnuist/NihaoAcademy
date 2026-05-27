@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, LogOut, Menu } from "lucide-react";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 import { mainNav } from "@/lib/site";
+import { createClient } from "@/lib/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
@@ -23,8 +25,19 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  /** Whether a user session exists (resolved server-side in the layout). */
+  signedIn?: boolean;
+  /** Where the "Dashboard" button points (admin vs student). */
+  dashboardHref?: string;
+}
+
+export function SiteHeader({
+  signedIn = false,
+  dashboardHref = "/student/dashboard",
+}: SiteHeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
@@ -34,6 +47,14 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <header
@@ -65,18 +86,39 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link
-            href="/login"
-            className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}
-          >
-            Log in
-          </Link>
-          <Link
-            href="/enroll"
-            className={cn(buttonVariants({ size: "lg" }))}
-          >
-            Enroll now
-          </Link>
+          {signedIn ? (
+            <>
+              <Link
+                href={dashboardHref}
+                className={cn(buttonVariants({ size: "lg" }))}
+              >
+                <LayoutDashboard className="size-4" />
+                Dashboard
+              </Link>
+              <button
+                onClick={signOut}
+                className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}
+              >
+                <LogOut className="size-4" />
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}
+              >
+                Log in
+              </Link>
+              <Link
+                href="/enroll"
+                className={cn(buttonVariants({ size: "lg" }))}
+              >
+                Enroll now
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="md:hidden">
@@ -118,30 +160,63 @@ export function SiteHeader() {
               </nav>
 
               <div className="mt-auto flex flex-col gap-2 border-t border-border p-4">
-                <SheetClose
-                  nativeButton={false}
-                  render={
-                    <Link
-                      href="/login"
-                      className={cn(
-                        buttonVariants({ variant: "outline", size: "lg" })
-                      )}
-                    />
-                  }
-                >
-                  Log in
-                </SheetClose>
-                <SheetClose
-                  nativeButton={false}
-                  render={
-                    <Link
-                      href="/enroll"
-                      className={cn(buttonVariants({ size: "lg" }))}
-                    />
-                  }
-                >
-                  Enroll now
-                </SheetClose>
+                {signedIn ? (
+                  <>
+                    <SheetClose
+                      nativeButton={false}
+                      render={
+                        <Link
+                          href={dashboardHref}
+                          className={cn(buttonVariants({ size: "lg" }))}
+                        />
+                      }
+                    >
+                      <LayoutDashboard className="size-4" />
+                      Dashboard
+                    </SheetClose>
+                    <SheetClose
+                      nativeButton={false}
+                      render={
+                        <button
+                          onClick={signOut}
+                          className={cn(
+                            buttonVariants({ variant: "outline", size: "lg" })
+                          )}
+                        />
+                      }
+                    >
+                      <LogOut className="size-4" />
+                      Sign out
+                    </SheetClose>
+                  </>
+                ) : (
+                  <>
+                    <SheetClose
+                      nativeButton={false}
+                      render={
+                        <Link
+                          href="/login"
+                          className={cn(
+                            buttonVariants({ variant: "outline", size: "lg" })
+                          )}
+                        />
+                      }
+                    >
+                      Log in
+                    </SheetClose>
+                    <SheetClose
+                      nativeButton={false}
+                      render={
+                        <Link
+                          href="/enroll"
+                          className={cn(buttonVariants({ size: "lg" }))}
+                        />
+                      }
+                    >
+                      Enroll now
+                    </SheetClose>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>
