@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Plane, Radio, Video } from "lucide-react";
+import { ArrowRight, Plane, Radio, Star, Users, Video } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { BrandAccent, Course } from "@/types";
@@ -23,10 +23,28 @@ const accentTile: Record<BrandAccent, string> = {
   gold: "bg-brand-gold/20 text-[oklch(0.55_0.12_74)]",
 };
 
-export function CourseCard({ course }: { course: Course }) {
+export function CourseCard({ course, compact = false }: { course: Course; compact?: boolean }) {
   const Icon = course.icon;
   const hasLive = course.divisions.includes("live");
   const hasRecorded = course.divisions.includes("recorded");
+
+  if (compact) {
+    return (
+      <Link
+        href={`/courses/${course.slug}`}
+        className="group flex items-center gap-4 rounded-xl bg-card p-4 ring-1 ring-foreground/10 transition-all hover:ring-primary/30"
+      >
+        <span className={cn("grid size-10 shrink-0 place-items-center rounded-lg", accentTile[course.accent])}>
+          <Icon className="size-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-heading text-sm font-semibold leading-snug">{course.shortName}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{formatBdt(course.priceBdt)}</p>
+        </div>
+        <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -115,6 +133,21 @@ export function CourseCard({ course }: { course: Course }) {
               </span>
               {course.priceNote && (
                 <span className="text-xs text-muted-foreground">{course.priceNote}</span>
+              )}
+            </div>
+            {/* Rating + students */}
+            <div className="flex items-center gap-2">
+              {course.rating && (
+                <span className="flex items-center gap-0.5 text-xs font-medium text-foreground">
+                  <Star className="size-3 fill-brand-gold text-brand-gold" />
+                  {course.rating.toFixed(1)}
+                </span>
+              )}
+              {course.enrolledCount && (
+                <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+                  <Users className="size-3" />
+                  {course.enrolledCount.toLocaleString()}
+                </span>
               )}
             </div>
             {/* Division badges */}

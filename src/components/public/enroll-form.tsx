@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { courses } from "@/lib/courses";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { submitEnrollment } from "@/app/actions/enrollment";
 
 const schema = z.object({
   fullName: z.string().trim().min(2, "Please enter your full name"),
@@ -40,6 +41,7 @@ const fieldBase =
   "h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50";
 
 export function EnrollForm({ defaultCourse = "" }: { defaultCourse?: string }) {
+  const [submitted, setSubmitted] = React.useState(false);
   const resolvedSlug = courses.some((c) => c.slug === defaultCourse) ? defaultCourse : "";
   const initialCourse = courses.find((c) => c.slug === resolvedSlug);
   const initialDivision = initialCourse?.divisions[0] ?? "live";
@@ -63,12 +65,10 @@ export function EnrollForm({ defaultCourse = "" }: { defaultCourse?: string }) {
     },
   });
 
-  // Watch the selected course to update division options dynamically
   const selectedSlug = useWatch({ control, name: "course" });
   const selectedCourse = courses.find((c) => c.slug === selectedSlug);
   const availableDivisions = selectedCourse?.divisions ?? ["live", "recorded"];
 
-  // When course changes, reset division to the first available for that course
   React.useEffect(() => {
     if (selectedCourse) {
       setValue("division", selectedCourse.divisions[0]);
@@ -76,22 +76,49 @@ export function EnrollForm({ defaultCourse = "" }: { defaultCourse?: string }) {
   }, [selectedSlug, selectedCourse, setValue]);
 
   async function onSubmit(values: Values) {
-    // No backend yet — simulate a successful reservation.
-    await new Promise((r) => setTimeout(r, 700));
-    const chosen = courses.find((c) => c.slug === values.course);
-    toast.success("Seat reserved!", {
-      description: `We'll call you within 24 hours to confirm your ${
-        chosen?.shortName ?? "course"
-      } enrollment (${values.division === "live" ? "Live" : "Recorded"} division).`,
-    });
-    reset({
-      fullName: "",
-      phone: "",
-      email: "",
-      course: values.course,
-      division: values.division,
-      message: "",
-    });
+    try {
+      await submitEnrollment({
+        fullName:   values.fullName,
+        phone:      values.phone,
+        email:      values.email || undefined,
+        courseSlug: values.course,
+        division:   values.division,
+        notes:      values.message || undefined,
+      });
+
+      const chosen = courses.find((c) => c.slug === values.course);
+      toast.success("Seat reserved!", {
+        description: `We'll call you within 24 hours to confirm your ${
+          chosen?.shortName ?? "course"
+        } enrollment (${values.division === "live" ? "Live" : "Recorded"} division).`,
+      });
+      setSubmitted(true);
+      reset();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      toast.error("Could not reserve seat", { description: msg });
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-8 text-center">
+        <span className="flex size-16 items-center justify-center rounded-full bg-emerald-100">
+          <CheckCircle2 className="size-8 text-emerald-600" />
+        </span>
+        <h2 className="text-xl font-bold">Seat reserved!</h2>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          We&apos;ve saved your reservation. Our team will call you within 24 hours
+          to confirm your batch, answer questions, and set up payment.
+        </p>
+        <button
+          onClick={() => setSubmitted(false)}
+          className="mt-2 text-sm font-semibold text-primary hover:underline"
+        >
+          Reserve another seat →
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -129,7 +156,7 @@ export function EnrollForm({ defaultCourse = "" }: { defaultCourse?: string }) {
 
       <div className="grid gap-2">
         <Label htmlFor="email">
-          Email <span className="text-muted-foreground">(optional)</span>
+          Email <span className="text-muted-foreground">(optional — for login link)</span>
         </Label>
         <Input
           id="email"
@@ -153,7 +180,7 @@ export function EnrollForm({ defaultCourse = "" }: { defaultCourse?: string }) {
             aria-invalid={!!errors.course}
             {...register("course")}
           >
-            <option value="">Choose a route…</option>
+            <option value="">Choose a course…</option>
             {courses.map((c) => (
               <option key={c.slug} value={c.slug}>
                 {c.shortName}
@@ -166,11 +193,10 @@ export function EnrollForm({ defaultCourse = "" }: { defaultCourse?: string }) {
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="division">Division</Label>
+          <Label htmlFor="division">Format</Label>
           <select
             id="division"
             className={fieldBase}
-            aria-label="Select division"
             {...register("division")}
           >
             {availableDivisions.map((d) => (
@@ -208,15 +234,9 @@ export function EnrollForm({ defaultCourse = "" }: { defaultCourse?: string }) {
         className="h-11 w-full bg-brand-red text-brand-red-foreground hover:bg-brand-red/90"
       >
         {isSubmitting ? (
-          <>
-            <Loader2 className="animate-spin" />
-            Reserving your seat…
-          </>
+          <><Loader2 className="animate-spin" /> Reserving your seat…</>
         ) : (
-          <>
-            Reserve my seat
-            <ArrowRight />
-          </>
+          <>Reserve my seat <ArrowRight /></>
         )}
       </Button>
 

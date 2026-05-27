@@ -3,15 +3,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
-  ArrowRight,
   BadgeCheck,
+  BookOpen,
   Check,
+  ChevronDown,
   Clock,
+  FileText,
   FlaskConical,
   GraduationCap,
+  PlayCircle,
   Plane,
   Radio,
   Sparkles,
+  Star,
+  Users,
   Video,
 } from "lucide-react";
 
@@ -24,9 +29,17 @@ import {
   formatBdt,
   getCourse,
 } from "@/lib/courses";
+import { getInstructorsForCourse } from "@/lib/instructors";
 import { siteConfig } from "@/lib/site";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Container } from "@/components/public/container";
+import { EnrollSection } from "@/components/public/enroll-section";
 import { LiveClassPanel } from "@/components/public/live-class-panel";
 import { RecordedPanel } from "@/components/public/recorded-panel";
 
@@ -73,12 +86,22 @@ export default async function CoursePage({
   const course = getCourse(slug);
   if (!course) notFound();
 
-  const enrollHref = `/enroll?course=${course.slug}`;
   const hasLive = course.divisions.includes("live");
   const hasRecorded = course.divisions.includes("recorded");
   const liveOnly = hasLive && !hasRecorded;
   const recordedOnly = !hasLive && hasRecorded;
   const both = hasLive && hasRecorded;
+  const courseInstructors = getInstructorsForCourse(course.slug);
+
+  // Curriculum totals
+  const totalLessons = course.curriculum?.flatMap((w) => w.lessons).length ?? course.recorded.lessons;
+  const totalHours = course.curriculum
+    ? Math.round(
+        course.curriculum
+          .flatMap((w) => w.lessons)
+          .reduce((sum, l) => sum + (l.durationMinutes ?? 0), 0) / 60
+      )
+    : null;
 
   return (
     <article>
@@ -144,6 +167,29 @@ export default async function CoursePage({
                 <span className="shrink-0">{course.toLabel}</span>
               </div>
 
+              {/* Rating + students */}
+              {(course.rating || course.enrolledCount) && (
+                <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
+                  {course.rating && (
+                    <span className="flex items-center gap-1.5 font-semibold">
+                      <Star className="size-4 fill-brand-gold text-brand-gold" />
+                      {course.rating.toFixed(1)}
+                      {course.reviewCount && (
+                        <span className="font-normal text-muted-foreground">
+                          ({course.reviewCount} reviews)
+                        </span>
+                      )}
+                    </span>
+                  )}
+                  {course.enrolledCount && (
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <Users className="size-4" />
+                      {course.enrolledCount.toLocaleString()} students enrolled
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* Meta chips */}
               <div className="mt-7 flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-medium text-foreground/80 ring-1 ring-foreground/10">
@@ -186,16 +232,12 @@ export default async function CoursePage({
                     )}
                   </div>
 
-                  <Link
-                    href={enrollHref}
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "mt-5 h-11 w-full bg-brand-red text-brand-red-foreground hover:bg-brand-red/90"
-                    )}
-                  >
-                    Reserve your seat
-                    <ArrowRight />
-                  </Link>
+                  <div className="mt-5">
+                    <EnrollSection
+                      courseSlug={course.slug}
+                      divisions={course.divisions as ("live" | "recorded")[]}
+                    />
+                  </div>
 
                   <dl className="mt-6 space-y-3 border-t border-dashed border-border pt-5 text-sm">
                     <div className="flex items-start justify-between gap-4">
@@ -301,6 +343,144 @@ export default async function CoursePage({
             </ol>
           </div>
 
+          {/* ─── Curriculum ─── */}
+          {course.curriculum && course.curriculum.length > 0 && (
+            <div>
+              <div className="flex items-end justify-between gap-4">
+                <h2 className="font-heading text-2xl font-semibold tracking-tight">
+                  Course curriculum
+                </h2>
+                <div className="flex shrink-0 flex-wrap gap-3 text-xs text-muted-foreground">
+                  {totalHours && (
+                    <span className="flex items-center gap-1">
+                      <Clock className="size-3.5" />
+                      {totalHours}h total
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1">
+                    <BookOpen className="size-3.5" />
+                    {totalLessons} lessons
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <PlayCircle className="size-3.5 text-emerald-500" />
+                    2 free previews
+                  </span>
+                </div>
+              </div>
+
+              <Accordion multiple={false} className="mt-5">
+                {course.curriculum.map((week) => {
+                  const weekLessons = week.lessons.length;
+                  const weekMinutes = week.lessons.reduce((s, l) => s + (l.durationMinutes ?? 0), 0);
+                  return (
+                    <AccordionItem key={week.weekNumber} value={String(week.weekNumber)}>
+                      <AccordionTrigger className="text-sm">
+                        <span className="flex flex-1 items-center justify-between gap-4 pr-2 text-left">
+                          <span className="font-semibold">{week.title}</span>
+                          <span className="shrink-0 text-xs font-normal text-muted-foreground">
+                            {weekLessons} lessons
+                            {weekMinutes > 0 && ` · ${Math.round(weekMinutes / 60 * 10) / 10}h`}
+                          </span>
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-2 pb-2">
+                          {week.lessons.map((lesson) => {
+                            const LessonIcon =
+                              lesson.type === "video"    ? PlayCircle
+                              : lesson.type === "live"   ? Radio
+                              : lesson.type === "quiz"   ? FileText
+                              : FileText;
+                            return (
+                              <li
+                                key={lesson.title}
+                                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-secondary/50"
+                              >
+                                <LessonIcon className={cn(
+                                  "size-4 shrink-0",
+                                  lesson.type === "live"  ? "text-emerald-500"
+                                  : lesson.type === "quiz" ? "text-brand-red"
+                                  : "text-muted-foreground"
+                                )} />
+                                <span className="flex-1 leading-snug">{lesson.title}</span>
+                                {lesson.isFreePreview && (
+                                  <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                                    Free
+                                  </span>
+                                )}
+                                {lesson.durationMinutes && (
+                                  <span className="shrink-0 text-xs text-muted-foreground">
+                                    {lesson.durationMinutes}m
+                                  </span>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
+              </Accordion>
+            </div>
+          )}
+
+          {/* ─── Instructors ─── */}
+          {courseInstructors.length > 0 && (
+            <div>
+              <h2 className="font-heading text-2xl font-semibold tracking-tight">
+                Your instructor{courseInstructors.length > 1 ? "s" : ""}
+              </h2>
+              <div className="mt-5 space-y-4">
+                {courseInstructors.map((inst) => (
+                  <div
+                    key={inst.slug}
+                    className="flex flex-col gap-4 rounded-xl bg-card p-5 ring-1 ring-foreground/10 sm:flex-row sm:items-start"
+                  >
+                    <div className={cn(
+                      "flex size-14 shrink-0 items-center justify-center rounded-xl font-heading text-xl font-bold",
+                      inst.accent === "blue" ? "bg-primary/10 text-primary"
+                      : inst.accent === "red" ? "bg-brand-red/10 text-brand-red"
+                      : "bg-brand-gold/20 text-[oklch(0.50_0.12_72)]"
+                    )}>
+                      {inst.initials}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-heading text-base font-semibold">{inst.name}</h3>
+                        {inst.nameZh && (
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {inst.nameZh}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{inst.title}</p>
+                      <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Users className="size-3.5" />
+                          {inst.studentCount.toLocaleString()} students
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Star className="size-3.5 fill-brand-gold text-brand-gold" />
+                          {inst.rating.toFixed(1)}
+                        </span>
+                      </div>
+                      <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                        {inst.bio}
+                      </p>
+                      <Link
+                        href={`/instructors/${inst.slug}`}
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                      >
+                        Full profile →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Outcomes */}
           <div className="rounded-xl bg-secondary/50 p-6 ring-1 ring-foreground/10">
             <div className="flex items-center gap-2">
@@ -395,16 +575,12 @@ export default async function CoursePage({
           <h2 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
             Ready to board the {course.shortName} route?
           </h2>
-          <Link
-            href={enrollHref}
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "h-11 bg-brand-red px-6 text-brand-red-foreground hover:bg-brand-red/90"
-            )}
-          >
-            Reserve your seat
-            <ArrowRight />
-          </Link>
+          <div className="w-full max-w-xs">
+            <EnrollSection
+              courseSlug={course.slug}
+              divisions={course.divisions as ("live" | "recorded")[]}
+            />
+          </div>
         </Container>
       </section>
     </article>

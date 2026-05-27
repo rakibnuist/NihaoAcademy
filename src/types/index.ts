@@ -67,6 +67,16 @@ export interface Course {
   live?: LiveClass;
   /** Present when the course is offered as a recorded division. */
   recorded: RecordedInfo;
+  /** Slug(s) of instructor(s) who teach this course. */
+  instructorSlugs?: string[];
+  /** Detailed curriculum weeks for the course detail page. */
+  curriculum?: CurriculumWeek[];
+  /** Number of enrolled students (marketing figure). */
+  enrolledCount?: number;
+  /** Average review rating (marketing figure). */
+  rating?: number;
+  /** Number of reviews (marketing figure). */
+  reviewCount?: number;
 }
 
 export interface NavItem {
@@ -85,6 +95,38 @@ export interface Testimonial {
 export interface FaqItem {
   question: string;
   answer: string;
+}
+
+/** A single lesson in a course curriculum (static marketing data). */
+export interface CurriculumLesson {
+  title: string;
+  type: "video" | "live" | "quiz" | "resource";
+  durationMinutes?: number;
+  isFreePreview?: boolean;
+}
+
+/** A curriculum week / module with its lesson list. */
+export interface CurriculumWeek {
+  weekNumber: number;
+  title: string;
+  lessons: CurriculumLesson[];
+}
+
+/** Static instructor profile for the public site. */
+export interface InstructorProfile {
+  slug: string;
+  name: string;
+  nameZh?: string;
+  initials: string;
+  title: string;
+  bio: string;
+  accent: BrandAccent;
+  /** Course slugs this instructor teaches. */
+  courseSlugs: string[];
+  studentCount: number;
+  rating: number;
+  credentials: string[];
+  subjects: string[];
 }
 
 export interface Stat {

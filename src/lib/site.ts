@@ -20,6 +20,8 @@ export const siteConfig = {
 export const mainNav: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Courses", href: "/courses" },
+  { label: "Mock Tests", href: "/mock-tests" },
+  { label: "Instructors", href: "/instructors" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

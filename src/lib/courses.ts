@@ -8,7 +8,7 @@ import {
   Stethoscope,
 } from "lucide-react";
 
-import type { Course, CourseCategory, LiveClass } from "@/types";
+import type { Course, CourseCategory, CurriculumWeek, LiveClass } from "@/types";
 
 export const carrierCode = "NA"; // "NiHao Air" — boarding-pass flavour
 
@@ -86,6 +86,63 @@ export const courses: Course[] = [
       lessons: 50,
       accessLabel: "12-month access",
     },
+    instructorSlugs: ["dr-rafiqul-islam"],
+    enrolledCount: 420,
+    rating: 4.8,
+    reviewCount: 134,
+    curriculum: [
+      {
+        weekNumber: 1,
+        title: "Foundations — Algebra & Functions",
+        lessons: [
+          { title: "Course orientation & exam overview", type: "video", durationMinutes: 15, isFreePreview: true },
+          { title: "Algebra: equations, inequalities and sets", type: "video", durationMinutes: 55, isFreePreview: true },
+          { title: "Functions — definition, domain, range", type: "video", durationMinutes: 50 },
+          { title: "Week 1 quiz — Algebra fundamentals", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Calculus — Limits & Differentiation",
+        lessons: [
+          { title: "Limits and continuity explained", type: "video", durationMinutes: 60 },
+          { title: "Derivatives — rules and applications", type: "video", durationMinutes: 65 },
+          { title: "Live class — derivatives problem session", type: "live", durationMinutes: 90 },
+          { title: "Week 2 quiz", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "Calculus — Integration",
+        lessons: [
+          { title: "Antiderivatives and indefinite integrals", type: "video", durationMinutes: 55 },
+          { title: "Definite integrals and area under curve", type: "video", durationMinutes: 60 },
+          { title: "Integration by substitution & parts", type: "video", durationMinutes: 50 },
+          { title: "Live class — integration drills", type: "live", durationMinutes: 90 },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Mechanics — Kinematics & Dynamics",
+        lessons: [
+          { title: "Kinematics: motion in one and two dimensions", type: "video", durationMinutes: 55 },
+          { title: "Newton's laws and their applications", type: "video", durationMinutes: 60 },
+          { title: "Work, energy and power", type: "video", durationMinutes: 50 },
+          { title: "Live class — mechanics problem set", type: "live", durationMinutes: 90 },
+        ],
+      },
+      {
+        weekNumber: 5,
+        title: "Electricity, Waves & Mock Exams",
+        lessons: [
+          { title: "Electric fields, circuits and Ohm's law", type: "video", durationMinutes: 65 },
+          { title: "Waves, optics and modern physics", type: "video", durationMinutes: 60 },
+          { title: "Full mock exam 1 — timed", type: "quiz" },
+          { title: "Mock exam review — live Q&A session", type: "live", durationMinutes: 90 },
+          { title: "Chinese terminology glossary PDF", type: "resource" },
+        ],
+      },
+    ],
   },
 
   /* ─────────────────────────────────────────────────────── 2. Medical CSCA */
@@ -153,6 +210,53 @@ export const courses: Course[] = [
       lessons: 50,
       accessLabel: "12-month access",
     },
+    instructorSlugs: ["dr-rafiqul-islam"],
+    enrolledCount: 310,
+    rating: 4.7,
+    reviewCount: 89,
+    curriculum: [
+      {
+        weekNumber: 1,
+        title: "Cell Biology & Genetics",
+        lessons: [
+          { title: "Course overview & Medical CSCA syllabus", type: "video", durationMinutes: 15, isFreePreview: true },
+          { title: "Cell structure and organelles", type: "video", durationMinutes: 55, isFreePreview: true },
+          { title: "Mitosis, meiosis and cell division", type: "video", durationMinutes: 60 },
+          { title: "Mendelian genetics fundamentals", type: "video", durationMinutes: 55 },
+          { title: "Week 1 quiz", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Organic & Inorganic Chemistry",
+        lessons: [
+          { title: "Chemical bonding and molecular structure", type: "video", durationMinutes: 55 },
+          { title: "Organic reactions and functional groups", type: "video", durationMinutes: 65 },
+          { title: "Stoichiometry and mole calculations", type: "video", durationMinutes: 50 },
+          { title: "Live class — chemistry problem session", type: "live", durationMinutes: 90 },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "Physics for Medicine",
+        lessons: [
+          { title: "Mechanics and fluid dynamics", type: "video", durationMinutes: 55 },
+          { title: "Electricity and bioelectric phenomena", type: "video", durationMinutes: 60 },
+          { title: "Optics and imaging in medicine", type: "video", durationMinutes: 50 },
+          { title: "Live class — medical physics", type: "live", durationMinutes: 90 },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Mock Papers & Chinese Terminology",
+        lessons: [
+          { title: "Full timed mock exam 1", type: "quiz" },
+          { title: "Bilingual medical terminology glossary", type: "resource" },
+          { title: "Mock review & exam strategy", type: "live", durationMinutes: 90 },
+          { title: "Full timed mock exam 2", type: "quiz" },
+        ],
+      },
+    ],
   },
 
   /* ─────────────────────────────────────────────────────── 3. Business CSCA */
@@ -219,6 +323,50 @@ export const courses: Course[] = [
       lessons: 36,
       accessLabel: "12-month access",
     },
+    instructorSlugs: ["zhang-ming"],
+    enrolledCount: 210,
+    rating: 4.7,
+    reviewCount: 62,
+    curriculum: [
+      {
+        weekNumber: 1,
+        title: "Algebra & Functions",
+        lessons: [
+          { title: "Business CSCA syllabus walkthrough", type: "video", durationMinutes: 15, isFreePreview: true },
+          { title: "Algebra: equations and systems", type: "video", durationMinutes: 55, isFreePreview: true },
+          { title: "Functions, sequences and series", type: "video", durationMinutes: 50 },
+          { title: "Week 1 practice quiz", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Statistics & Probability",
+        lessons: [
+          { title: "Descriptive statistics and data analysis", type: "video", durationMinutes: 55 },
+          { title: "Probability distributions", type: "video", durationMinutes: 60 },
+          { title: "Live class — statistics problem set", type: "live", durationMinutes: 90 },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "Calculus Foundations",
+        lessons: [
+          { title: "Limits and introduction to derivatives", type: "video", durationMinutes: 55 },
+          { title: "Business applications of calculus", type: "video", durationMinutes: 50 },
+          { title: "Live class — calculus in economics", type: "live", durationMinutes: 90 },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Mandarin Reading & Mock Tests",
+        lessons: [
+          { title: "Chinese maths terminology guide", type: "resource" },
+          { title: "Mandarin reading comprehension drills", type: "video", durationMinutes: 45 },
+          { title: "Full mock exam — Business CSCA", type: "quiz" },
+          { title: "Mock review live session", type: "live", durationMinutes: 90 },
+        ],
+      },
+    ],
   },
 
   /* ─────────────────────────────────────────────────────── 4. All Star CSCA */
@@ -290,6 +438,56 @@ export const courses: Course[] = [
       lessons: 80,
       accessLabel: "12-month access",
     },
+    instructorSlugs: ["dr-rafiqul-islam", "zhang-ming"],
+    enrolledCount: 540,
+    rating: 4.9,
+    reviewCount: 178,
+    curriculum: [
+      {
+        weekNumber: 1,
+        title: "Mathematics Deep Dive — Weeks 1–2",
+        lessons: [
+          { title: "All Star overview & study plan", type: "video", durationMinutes: 20, isFreePreview: true },
+          { title: "Calculus: full derivatives and integrals", type: "video", durationMinutes: 75, isFreePreview: true },
+          { title: "Algebra, linear algebra and matrices", type: "video", durationMinutes: 70 },
+          { title: "Statistics and probability", type: "video", durationMinutes: 65 },
+          { title: "Live — maths problem marathon", type: "live", durationMinutes: 90 },
+          { title: "Maths mock quiz 1", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Physics Mastery — Weeks 3–4",
+        lessons: [
+          { title: "Mechanics: full kinematics and dynamics", type: "video", durationMinutes: 70 },
+          { title: "Electricity, magnetism and circuits", type: "video", durationMinutes: 65 },
+          { title: "Waves, optics and modern physics", type: "video", durationMinutes: 60 },
+          { title: "Live — physics problem marathon", type: "live", durationMinutes: 90 },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "Chemistry Complete — Weeks 5–6",
+        lessons: [
+          { title: "Inorganic chemistry and periodic table", type: "video", durationMinutes: 65 },
+          { title: "Organic chemistry: reactions and mechanisms", type: "video", durationMinutes: 70 },
+          { title: "Physical chemistry and equilibria", type: "video", durationMinutes: 60 },
+          { title: "Live — chemistry problem marathon", type: "live", durationMinutes: 90 },
+          { title: "Full chemistry notes PDF", type: "resource" },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Integrated Mock Exams — Weeks 7–8",
+        lessons: [
+          { title: "Full timed mock exam 1 — all subjects", type: "quiz" },
+          { title: "Mock 1 review live session", type: "live", durationMinutes: 90 },
+          { title: "Full timed mock exam 2 — all subjects", type: "quiz" },
+          { title: "Mock 2 review and exam strategy", type: "live", durationMinutes: 90 },
+          { title: "Chinese terminology master glossary", type: "resource" },
+        ],
+      },
+    ],
   },
 
   /* ─────────────────────────────────────────────────────── 5. Chinese HSK */
@@ -356,6 +554,55 @@ export const courses: Course[] = [
       lessons: 40,
       accessLabel: "12-month access",
     },
+    instructorSlugs: ["li-wei"],
+    enrolledCount: 680,
+    rating: 4.9,
+    reviewCount: 215,
+    curriculum: [
+      {
+        weekNumber: 1,
+        title: "Pinyin & HSK 1 (Weeks 1–4)",
+        lessons: [
+          { title: "Tones and pinyin masterclass", type: "video", durationMinutes: 45, isFreePreview: true },
+          { title: "HSK 1 vocabulary: 150 words systematic", type: "video", durationMinutes: 60, isFreePreview: true },
+          { title: "Greetings, numbers and daily expressions", type: "video", durationMinutes: 50 },
+          { title: "Live class — speaking and tones practice", type: "live", durationMinutes: 90 },
+          { title: "HSK 1 full mock exam", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "HSK 2 — Everyday Chinese (Weeks 5–8)",
+        lessons: [
+          { title: "HSK 2 vocabulary: 300 words", type: "video", durationMinutes: 65 },
+          { title: "Grammar patterns: time, comparison, negation", type: "video", durationMinutes: 60 },
+          { title: "Listening comprehension strategies", type: "video", durationMinutes: 50 },
+          { title: "Live class — dialogue practice", type: "live", durationMinutes: 90 },
+          { title: "HSK 2 full mock exam", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "HSK 3 — Intermediate Leap (Weeks 9–14)",
+        lessons: [
+          { title: "HSK 3 vocabulary: 300 new words (600 total)", type: "video", durationMinutes: 70 },
+          { title: "Reading passages and comprehension", type: "video", durationMinutes: 65 },
+          { title: "Written responses and character practice", type: "video", durationMinutes: 60 },
+          { title: "Live class — reading and writing workshop", type: "live", durationMinutes: 90 },
+          { title: "HSK 3 full mock exam 1", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Exam Strategy & Final Prep (Weeks 15–16)",
+        lessons: [
+          { title: "HSK exam format deep dive", type: "video", durationMinutes: 40 },
+          { title: "HSK 3 full mock exam 2 — timed", type: "quiz" },
+          { title: "Mock exam review live session", type: "live", durationMinutes: 90 },
+          { title: "Vocabulary flashcard pack PDF", type: "resource" },
+        ],
+      },
+    ],
   },
 
   /* ─────────────────────────────────────────────────────── 6. Professional Chinese */
@@ -413,6 +660,52 @@ export const courses: Course[] = [
       lessons: 32,
       accessLabel: "Lifetime access",
     },
+    instructorSlugs: ["zhang-ming", "li-wei"],
+    enrolledCount: 175,
+    rating: 4.7,
+    reviewCount: 54,
+    curriculum: [
+      {
+        weekNumber: 1,
+        title: "Business Basics (Self-paced)",
+        lessons: [
+          { title: "Why Professional Chinese? Course overview", type: "video", durationMinutes: 12, isFreePreview: true },
+          { title: "Introductions, numbers and company talk", type: "video", durationMinutes: 45, isFreePreview: true },
+          { title: "Meeting etiquette and greetings", type: "video", durationMinutes: 40 },
+          { title: "Pronunciation essentials for business", type: "video", durationMinutes: 35 },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Trade & Commerce",
+        lessons: [
+          { title: "Orders, pricing and shipping vocabulary", type: "video", durationMinutes: 50 },
+          { title: "Reading Chinese invoices and labels", type: "video", durationMinutes: 45 },
+          { title: "Supply chain and logistics phrases", type: "video", durationMinutes: 45 },
+          { title: "Trade vocabulary quiz", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "Negotiation & Contracts",
+        lessons: [
+          { title: "Agreement and price negotiation phrases", type: "video", durationMinutes: 50 },
+          { title: "Reading Chinese contracts — key clauses", type: "video", durationMinutes: 55 },
+          { title: "Polite refusals and counter-offers", type: "video", durationMinutes: 40 },
+          { title: "Contract vocabulary PDF", type: "resource" },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Culture, Etiquette & Final Review",
+        lessons: [
+          { title: "Mianzi, guanxi and business culture", type: "video", durationMinutes: 45 },
+          { title: "Gift-giving, dinners and relationship building", type: "video", durationMinutes: 40 },
+          { title: "Final vocabulary and phrase review quiz", type: "quiz" },
+          { title: "Business Chinese phrase book PDF", type: "resource" },
+        ],
+      },
+    ],
   },
 
   /* ─────────────────────────────────────────────────────── 7. DET Crash Course */
@@ -471,6 +764,52 @@ export const courses: Course[] = [
       lessons: 24,
       accessLabel: "Lifetime access",
     },
+    instructorSlugs: ["nadia-chen"],
+    enrolledCount: 290,
+    rating: 4.9,
+    reviewCount: 98,
+    curriculum: [
+      {
+        weekNumber: 1,
+        title: "DET Format & Strategy",
+        lessons: [
+          { title: "How the DET adaptive test works", type: "video", durationMinutes: 20, isFreePreview: true },
+          { title: "Section breakdown and scoring explained", type: "video", durationMinutes: 25, isFreePreview: true },
+          { title: "Test-day strategy and time management", type: "video", durationMinutes: 20 },
+          { title: "Strategy quiz", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Reading & Listening Drills",
+        lessons: [
+          { title: "Read Aloud — speed and accuracy drills", type: "video", durationMinutes: 35 },
+          { title: "Listen and Type — transcription practice", type: "video", durationMinutes: 40 },
+          { title: "Complete the Sentence patterns", type: "video", durationMinutes: 35 },
+          { title: "Reading & listening mock drill", type: "quiz" },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "Writing Workshop",
+        lessons: [
+          { title: "Writing sample frameworks — task types", type: "video", durationMinutes: 40 },
+          { title: "Opinion essays: structure and scoring", type: "video", durationMinutes: 45 },
+          { title: "Common mistakes and how to avoid them", type: "video", durationMinutes: 30 },
+          { title: "Writing templates PDF", type: "resource" },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Speaking & Full Mock Tests",
+        lessons: [
+          { title: "Speaking sample: how to maximise your score", type: "video", durationMinutes: 35 },
+          { title: "Full DET mock test 1 — all sections", type: "quiz" },
+          { title: "Mock 1 review and scoring analysis", type: "video", durationMinutes: 30 },
+          { title: "Full DET mock test 2 — final practice", type: "quiz" },
+        ],
+      },
+    ],
   },
 ];
 
