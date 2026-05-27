@@ -236,6 +236,7 @@ export default async function CoursePage({
                     <EnrollSection
                       courseSlug={course.slug}
                       divisions={course.divisions as ("live" | "recorded")[]}
+                      priceLabel={formatBdt(course.priceBdt)}
                     />
                   </div>
 
@@ -579,6 +580,7 @@ export default async function CoursePage({
             <EnrollSection
               courseSlug={course.slug}
               divisions={course.divisions as ("live" | "recorded")[]}
+              priceLabel={formatBdt(course.priceBdt)}
             />
           </div>
         </Container>

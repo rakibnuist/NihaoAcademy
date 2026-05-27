@@ -1,102 +1,67 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, Sparkles, XCircle } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { EnrollButton } from "@/components/public/enroll-button";
+import { EnrollChoices } from "@/components/public/enroll-choices";
+import { TRIAL_NOTE_TAG } from "@/lib/enrollment";
 
 interface EnrollSectionProps {
   courseSlug: string;
   divisions: ("live" | "recorded")[];
+  /** Formatted price, e.g. "BDT 18,000" — shown on the enroll button. */
+  priceLabel: string;
   /** Tailwind class for the primary CTA background, e.g. "bg-brand-red" */
   ctaClass?: string;
 }
 
 type EnrollmentStatus = "pending" | "active" | "completed" | "cancelled";
 
+interface EnrollmentState {
+  status: EnrollmentStatus;
+  feeStatus: string | null;
+  isTrial: boolean;
+}
+
 async function getEnrollmentState(
   courseSlug: string,
   userId: string
-): Promise<{ status: EnrollmentStatus; division: string | null } | null> {
+): Promise<EnrollmentState | null> {
   const supabase = await createClient();
 
-  // Strategy 1: enrollment linked to a batch that belongs to this course
-  const { data: batchEnrollments } = await supabase
+  // Pull all live/finished enrollments, then match by batch course or notes slug.
+  const { data: rows } = await supabase
     .from("enrollments")
-    .select("status, batches!inner(course_slug, division)")
+    .select("status, fee_status, notes, batches(course_slug)")
     .eq("student_id", userId)
     .in("status", ["pending", "active", "completed"])
-    .limit(20);
+    .limit(30);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const batchMatch = (batchEnrollments as any[])?.find(
-    (row) => row.batches?.course_slug === courseSlug
+  const match = (rows as any[])?.find(
+    (r) =>
+      r.batches?.course_slug === courseSlug ||
+      (typeof r.notes === "string" && r.notes.includes(courseSlug))
   );
 
-  if (batchMatch) {
-    return {
-      status: batchMatch.status as EnrollmentStatus,
-      division: batchMatch.batches?.division ?? null,
-    };
-  }
+  if (!match) return null;
 
-  // Strategy 2: batch-less enrollment whose notes contain the course slug
-  // (requestEnrollment writes: "Self-enrollment request · <slug> · <division>")
-  const { data: noBatchEnrollments } = await supabase
-    .from("enrollments")
-    .select("status, notes")
-    .eq("student_id", userId)
-    .is("batch_id", null)
-    .in("status", ["pending", "active", "completed"])
-    .limit(20);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const noteMatch = (noBatchEnrollments as any[])?.find(
-    (row) => typeof row.notes === "string" && row.notes.includes(courseSlug)
-  );
-
-  if (noteMatch) {
-    // Parse division from the notes string
-    const divisionMatch = (noteMatch.notes as string).match(/·\s+(live|recorded)$/);
-    return {
-      status: noteMatch.status as EnrollmentStatus,
-      division: divisionMatch?.[1] ?? null,
-    };
-  }
-
-  return null;
+  return {
+    status: match.status as EnrollmentStatus,
+    feeStatus: match.fee_status ?? null,
+    isTrial:
+      match.status === "active" &&
+      match.fee_status !== "paid" &&
+      typeof match.notes === "string" &&
+      match.notes.includes(TRIAL_NOTE_TAG),
+  };
 }
-
-const statusConfig: Record<
-  EnrollmentStatus,
-  { label: string; icon: React.ReactNode; classes: string }
-> = {
-  pending: {
-    label: "Enrollment pending review",
-    icon: <Clock className="size-4 shrink-0" />,
-    classes: "bg-amber-500/10 text-amber-700 ring-amber-400/30",
-  },
-  active: {
-    label: "You're enrolled — access your dashboard",
-    icon: <CheckCircle2 className="size-4 shrink-0" />,
-    classes: "bg-emerald-500/10 text-emerald-700 ring-emerald-400/30",
-  },
-  completed: {
-    label: "Course completed",
-    icon: <CheckCircle2 className="size-4 shrink-0" />,
-    classes: "bg-primary/10 text-primary ring-primary/30",
-  },
-  cancelled: {
-    label: "Enrollment cancelled",
-    icon: <XCircle className="size-4 shrink-0" />,
-    classes: "bg-destructive/10 text-destructive ring-destructive/30",
-  },
-};
 
 export async function EnrollSection({
   courseSlug,
   divisions,
+  priceLabel,
   ctaClass = "bg-brand-red text-brand-red-foreground hover:bg-brand-red/90",
 }: EnrollSectionProps) {
   const supabase = await createClient();
@@ -104,7 +69,7 @@ export async function EnrollSection({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // ── Not logged in ──────────────────────────────────────────────────────────
+  // ── Not logged in → gate behind login ──────────────────────────────────────
   if (!user) {
     return (
       <Link
@@ -117,44 +82,79 @@ export async function EnrollSection({
     );
   }
 
-  // ── Logged in — check existing enrollment ─────────────────────────────────
   const enrollment = await getEnrollmentState(courseSlug, user.id);
 
-  if (enrollment && enrollment.status !== "cancelled") {
-    const cfg = statusConfig[enrollment.status];
+  // ── Free trial active → show upgrade path ──────────────────────────────────
+  if (enrollment?.isTrial) {
     return (
       <div className="space-y-3">
-        <div
-          className={cn(
-            "flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium ring-1",
-            cfg.classes
-          )}
-        >
-          {cfg.icon}
-          {cfg.label}
+        <div className="flex items-center gap-2 rounded-lg bg-violet-500/10 px-4 py-3 text-sm font-medium text-violet-700 ring-1 ring-violet-400/30">
+          <Sparkles className="size-4 shrink-0" />
+          Free trial active — 2 classes unlocked
         </div>
-        {enrollment.status === "active" && (
-          <Link
-            href="/student/dashboard"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "h-11 w-full",
-              ctaClass
-            )}
-          >
-            Go to my dashboard
-            <ArrowRight />
-          </Link>
-        )}
+        <Link
+          href="/student/dashboard"
+          className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 w-full")}
+        >
+          Continue your free classes
+          <ArrowRight />
+        </Link>
+        <EnrollChoices
+          courseSlug={courseSlug}
+          divisions={divisions}
+          priceLabel={priceLabel}
+          upgradeOnly
+          ctaClass={ctaClass}
+        />
       </div>
     );
   }
 
-  // ── Logged in, no active enrollment — show enroll button ──────────────────
+  // ── Paid + active → full access ────────────────────────────────────────────
+  if (enrollment && enrollment.status === "active") {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 ring-1 ring-emerald-400/30">
+          <CheckCircle2 className="size-4 shrink-0" />
+          You&apos;re enrolled — full access
+        </div>
+        <Link
+          href="/student/dashboard"
+          className={cn(buttonVariants({ size: "lg" }), "h-11 w-full", ctaClass)}
+        >
+          Go to my dashboard
+          <ArrowRight />
+        </Link>
+      </div>
+    );
+  }
+
+  // ── Pending review ─────────────────────────────────────────────────────────
+  if (enrollment && enrollment.status === "pending") {
+    return (
+      <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-700 ring-1 ring-amber-400/30">
+        <Clock className="size-4 shrink-0" />
+        Enrollment pending review
+      </div>
+    );
+  }
+
+  // ── Completed ──────────────────────────────────────────────────────────────
+  if (enrollment && enrollment.status === "completed") {
+    return (
+      <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-3 text-sm font-medium text-primary ring-1 ring-primary/30">
+        <CheckCircle2 className="size-4 shrink-0" />
+        Course completed
+      </div>
+    );
+  }
+
+  // ── No live enrollment → offer both paths ──────────────────────────────────
   return (
-    <EnrollButton
+    <EnrollChoices
       courseSlug={courseSlug}
       divisions={divisions}
+      priceLabel={priceLabel}
       ctaClass={ctaClass}
     />
   );

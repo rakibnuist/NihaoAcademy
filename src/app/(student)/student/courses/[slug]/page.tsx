@@ -8,6 +8,7 @@ import {
   FileText,
   Lock,
   Radio,
+  Sparkles,
   Video,
 } from "lucide-react";
 
@@ -51,7 +52,7 @@ export default async function StudentCoursePage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: rawEnrollment } = await (supabase.from("enrollments") as any)
     .select(
-      "id, enrolled_at, batch_id, batches(id, name, course_slug, division, start_date, schedule)"
+      "id, enrolled_at, batch_id, fee_status, notes, batches(id, name, course_slug, division, start_date, schedule)"
     )
     .eq("student_id", user.id)
     .eq("status", "active")
@@ -68,7 +69,7 @@ export default async function StudentCoursePage({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (supabase.from("enrollments") as any)
       .select(
-        "id, enrolled_at, batch_id, batches!inner(id, name, course_slug, division, start_date, schedule)"
+        "id, enrolled_at, batch_id, fee_status, notes, batches!inner(id, name, course_slug, division, start_date, schedule)"
       )
       .eq("student_id", user.id)
       .eq("status", "active")
@@ -82,6 +83,11 @@ export default async function StudentCoursePage({
   if (!enrollment) {
     redirect(`/courses/${slug}`);
   }
+
+  /* Trial vs paid access:
+     - paid (fee_status "paid")  → full course, drip-unlocked
+     - trial (otherwise)         → only lessons marked is_free_preview */
+  const isPaid = enrollment.fee_status === "paid";
 
   /* Fetch lessons for this batch (or course-level if no batch) */
   const batchId = enrollment.batch_id;
@@ -157,6 +163,29 @@ export default async function StudentCoursePage({
         )}
       </div>
 
+      {/* Free-trial upgrade banner */}
+      {!isPaid && (
+        <div className="flex flex-col gap-3 rounded-xl bg-violet-500/10 px-5 py-4 ring-1 ring-violet-400/30 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2.5">
+            <Sparkles className="mt-0.5 size-4 shrink-0 text-violet-600" />
+            <div>
+              <p className="text-sm font-semibold text-violet-700">
+                You&apos;re on the free trial
+              </p>
+              <p className="text-xs text-violet-700/80">
+                Your 2 free classes are unlocked. Upgrade to open the full course.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/courses/${slug}`}
+            className="shrink-0 rounded-lg bg-violet-600 px-4 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-violet-700"
+          >
+            Unlock full course
+          </Link>
+        </div>
+      )}
+
       {/* Progress bar */}
       {lessons.length > 0 && (
         <div className="rounded-xl bg-card px-5 py-4 ring-1 ring-foreground/10 space-y-2">
@@ -214,7 +243,9 @@ export default async function StudentCoursePage({
                     const progress = progressMap[lesson.id];
                     const completed = progress?.completed ?? false;
                     const watchPct = progress?.watch_percent ?? 0;
-                    const accessible = unlocked || lesson.is_free_preview;
+                    // Free-preview lessons are always open; everything else needs
+                    // a paid enrollment AND the drip window to have opened.
+                    const accessible = lesson.is_free_preview || (isPaid && unlocked);
 
                     return (
                       <div key={lesson.id} className="relative">

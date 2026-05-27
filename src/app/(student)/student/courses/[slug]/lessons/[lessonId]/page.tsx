@@ -45,11 +45,13 @@ export default async function LessonViewerPage({
 
   const l = lesson as Lesson;
 
-  /* Check access: free preview OR active enrollment */
+  /* Check access: free-preview lessons are open to anyone with an active
+     enrollment (incl. trial). Everything else needs a PAID enrollment whose
+     drip window has opened. */
   if (!l.is_free_preview) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: enrollment } = await (supabase.from("enrollments") as any)
-      .select("id, enrolled_at, batch_id")
+      .select("id, enrolled_at, batch_id, fee_status")
       .eq("student_id", user.id)
       .eq("status", "active")
       .order("enrolled_at", { ascending: false })
@@ -57,6 +59,11 @@ export default async function LessonViewerPage({
       .maybeSingle();
 
     if (!enrollment) redirect(`/courses/${slug}`);
+
+    // Trial (unpaid) users can't open paid lessons — send them back to upgrade.
+    if (enrollment.fee_status !== "paid") {
+      redirect(`/student/courses/${slug}`);
+    }
 
     if (!isUnlocked(enrollment.enrolled_at, l.week_number)) {
       redirect(`/student/courses/${slug}`);
