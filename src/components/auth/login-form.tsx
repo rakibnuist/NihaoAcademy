@@ -67,7 +67,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
           email,
           options: {
             shouldCreateUser: true,
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(destination)}`,
+            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin}/auth/callback?next=${encodeURIComponent(destination)}`,
           },
         });
         if (err) throw err;
