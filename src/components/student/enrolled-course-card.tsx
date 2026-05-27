@@ -121,7 +121,15 @@ export function EnrolledCourseCard({ enrollment, batch }: EnrolledCourseCardProp
             {STATUS_LABEL[enrollment.status]}
           </span>
 
-          {course && enrollment.status !== "cancelled" && (
+          {course && enrollment.status === "active" && (
+            <Link
+              href={`/student/courses/${course.slug}`}
+              className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Go to lessons →
+            </Link>
+          )}
+          {course && enrollment.status === "pending" && (
             <Link
               href={`/courses/${course.slug}`}
               className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-secondary/80"
