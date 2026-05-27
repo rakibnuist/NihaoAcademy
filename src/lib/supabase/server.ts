@@ -11,11 +11,15 @@ import type { Database, Student } from "@/types/database";
 export async function createClient(serviceRole = false) {
   const cookieStore = await cookies();
 
+  // If service role key is missing, fall back to anon key.
+  // RLS admin policies (app_metadata.role = 'admin') cover the gap.
+  const key = serviceRole
+    ? (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    serviceRole
-      ? process.env.SUPABASE_SERVICE_ROLE_KEY!
-      : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    key,
     {
       cookies: {
         getAll() {
