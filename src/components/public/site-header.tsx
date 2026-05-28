@@ -33,13 +33,22 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({
-  signedIn = false,
-  dashboardHref = "/student/dashboard",
+  signedIn: initialSignedIn = false,
+  dashboardHref: initialDashboardHref = "/student/dashboard",
 }: SiteHeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+
+  // Auth state is seeded from the server (no flash) but treated as
+  // authoritative on the client. Next.js caches layouts across client-side
+  // navigations, so the server-seeded prop can be STALE (e.g. you logged in
+  // on another route and came back). We re-check the real session here and
+  // subscribe to auth changes so the header can never disagree with reality.
+  const [signedIn, setSignedIn] = React.useState(initialSignedIn);
+  const [dashboardHref, setDashboardHref] = React.useState(initialDashboardHref);
+  const didRefresh = React.useRef(false);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -48,9 +57,43 @@ export function SiteHeader({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  React.useEffect(() => {
+    const supabase = createClient();
+    let active = true;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const apply = (user: any) => {
+      if (!active) return;
+      const nextSignedIn = !!user;
+      const role = user?.app_metadata?.role as string | undefined;
+      setSignedIn(nextSignedIn);
+      setDashboardHref(role === "admin" ? "/admin/dashboard" : "/student/dashboard");
+
+      // If the cached server render disagreed with the real client session,
+      // refresh once so sibling server components (e.g. the enroll card) re-sync.
+      if (nextSignedIn !== initialSignedIn && !didRefresh.current) {
+        didRefresh.current = true;
+        router.refresh();
+      }
+    };
+
+    supabase.auth.getUser().then(({ data }) => apply(data.user));
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      apply(session?.user ?? null);
+    });
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSignedIn]);
+
   async function signOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
+    setSignedIn(false);
     toast.success("Signed out");
     router.push("/");
     router.refresh();
