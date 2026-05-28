@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack && cp -r public .next/standalone/nihao-academy/public && cp -r .next/static .next/standalone/nihao-academy/.next/static",
-    "start": "NODE_OPTIONS='--max-old-space-size=384' node .next/standalone/nihao-academy/server.js",
+    "build": "next build --webpack && cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static",
+    "start": "NODE_OPTIONS='--max-old-space-size=384' node .next/standalone/server.js",
     "lint": "eslint"
   },
   "dependencies": {
