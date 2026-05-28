@@ -53,6 +53,9 @@ export default function ProfileSetupPage() {
   const [eduYear, setEduYear]                 = useState("");
   const [eduGrade, setEduGrade]               = useState("");
   const [intMajor, setIntMajor]               = useState("");
+  // Guardian/parent contact for missed-class SMS alerts.
+  const [guardianPhone, setGuardianPhone]     = useState("");
+  const [notifyGuardian, setNotifyGuardian]   = useState(true);
 
   function toggleCourse(slug: string) {
     setSelectedCourses((prev) =>
@@ -81,6 +84,8 @@ export default function ProfileSetupPage() {
     if (eduYear)    fd.append("edu_passing_year", eduYear);
     if (eduGrade)   fd.append("edu_grade", eduGrade);
     if (intMajor)   fd.append("interested_major", intMajor);
+    if (guardianPhone.trim()) fd.append("guardian_phone", guardianPhone.trim());
+    if (notifyGuardian)       fd.append("notify_guardian", "on");
 
     const result = await completeProfile(fd);
     setLoading(false);
@@ -187,6 +192,35 @@ export default function ProfileSetupPage() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Guardian / parent contact for missed-class alerts */}
+                <div className="rounded-xl border border-dashed border-border bg-secondary/30 p-4 space-y-3">
+                  <div>
+                    <label className={labelCls}>
+                      Parent / guardian phone <span className="font-normal text-muted-foreground">(optional)</span>
+                    </label>
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      className={inputCls}
+                      placeholder="+8801XXXXXXXXX"
+                      value={guardianPhone}
+                      onChange={(e) => setGuardianPhone(e.target.value)}
+                    />
+                    <p className="mt-1.5 text-xs text-muted-foreground">
+                      We&apos;ll send an SMS to your guardian only if you miss a class.
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={notifyGuardian}
+                      onChange={(e) => setNotifyGuardian(e.target.checked)}
+                      className="size-4 rounded border-border accent-primary"
+                    />
+                    <span className="text-sm">Notify my guardian on missed classes</span>
+                  </label>
                 </div>
               </div>
             )}

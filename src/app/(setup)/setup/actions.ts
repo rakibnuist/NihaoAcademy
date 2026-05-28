@@ -16,6 +16,10 @@ export async function completeProfile(formData: FormData) {
   const eduYear      = formData.get("edu_passing_year") ? Number(formData.get("edu_passing_year")) : null;
   const eduGrade     = (formData.get("edu_grade") as string)?.trim() || null;
   const intMajor     = (formData.get("interested_major") as string)?.trim() || null;
+  // Guardian/parent contact — used for missed-class SMS alerts (M11).
+  const guardianRaw  = (formData.get("guardian_phone") as string)?.trim() || "";
+  const guardianPhone = guardianRaw.length >= 6 ? guardianRaw : null;
+  const notifyGuardian = formData.get("notify_guardian") === "on";
 
   if (!fullName)         return { error: "Full name is required." };
   if (!gender)           return { error: "Please select your gender." };
@@ -47,6 +51,8 @@ export async function completeProfile(formData: FormData) {
     edu_passing_year:   eduYear,
     edu_grade:          eduGrade,
     interested_major:   intMajor,
+    guardian_phone:     guardianPhone,
+    notify_guardian:    notifyGuardian,
     profile_completed:  true,
     updated_at:         new Date().toISOString(),
   }).eq("id", user.id);

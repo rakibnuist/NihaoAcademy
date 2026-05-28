@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/server";
 import { getCourse } from "@/lib/courses";
 import { MarkCompleteButton } from "./mark-complete-button";
+import { LessonPlayer } from "./lesson-player";
 import type { Lesson } from "@/types/database";
 
 export const metadata: Metadata = { title: "Lesson · NiHao Academy" };
@@ -129,28 +130,14 @@ export default async function LessonViewerPage({
         </div>
       </div>
 
-      {/* Video player */}
+      {/* Video player with automatic watch-time tracking (M9 engagement) */}
       {videoUrl && (
-        <div className="overflow-hidden rounded-xl bg-black ring-1 ring-foreground/10">
-          {isBunny ? (
-            <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-              <iframe
-                src={videoUrl}
-                className="absolute inset-0 h-full w-full"
-                allowFullScreen
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-              />
-            </div>
-          ) : (
-            <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-              <video
-                src={videoUrl}
-                controls
-                className="absolute inset-0 h-full w-full"
-              />
-            </div>
-          )}
-        </div>
+        <LessonPlayer
+          lessonId={lessonId}
+          videoUrl={videoUrl}
+          isBunny={!!isBunny}
+          fallbackDurationMin={l.duration_minutes ?? null}
+        />
       )}
 
       {/* Resource link */}

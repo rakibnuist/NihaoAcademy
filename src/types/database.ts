@@ -32,6 +32,8 @@ export interface Database {
           edu_passing_year: number | null;
           edu_grade: string | null;
           interested_major: string | null;
+          guardian_phone: string | null;
+          notify_guardian: boolean;
           profile_completed: boolean;
           created_at: string;
           updated_at: string;
@@ -50,6 +52,8 @@ export interface Database {
           edu_passing_year?: number | null;
           edu_grade?: string | null;
           interested_major?: string | null;
+          guardian_phone?: string | null;
+          notify_guardian?: boolean;
           profile_completed?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -68,6 +72,8 @@ export interface Database {
           edu_passing_year?: number | null;
           edu_grade?: string | null;
           interested_major?: string | null;
+          guardian_phone?: string | null;
+          notify_guardian?: boolean;
           profile_completed?: boolean;
           updated_at?: string;
         };
