@@ -457,6 +457,31 @@ export interface Database {
           comment?: string | null;
         };
       };
+      notifications: {
+        Row: {
+          id: string;
+          student_id: string;
+          kind: string;
+          title: string;
+          body: string;
+          link: string | null;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          student_id: string;
+          kind: string;
+          title: string;
+          body: string;
+          link?: string | null;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          read_at?: string | null;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -487,6 +512,8 @@ export type LessonInsert = Database["public"]["Tables"]["lessons"]["Insert"];
 export type LessonProgress = Database["public"]["Tables"]["lesson_progress"]["Row"];
 export type CourseReview = Database["public"]["Tables"]["course_reviews"]["Row"];
 export type MockTest = Database["public"]["Tables"]["mock_tests"]["Row"];
+export type Notification = Database["public"]["Tables"]["notifications"]["Row"];
+export type NotificationInsert = Database["public"]["Tables"]["notifications"]["Insert"];
 export type MockQuestion = Database["public"]["Tables"]["mock_questions"]["Row"];
 export type MockAttempt = Database["public"]["Tables"]["mock_attempts"]["Row"];
 export type MockAttemptDetail = Database["public"]["Tables"]["mock_attempt_details"]["Row"];
